@@ -1,0 +1,99 @@
+---
+title: "adgs_report_niklasnowak"
+author: "Niklas Nowak"
+date: "2023-02-27"
+output: html_document
+--- 
+
+Report Exercice 3
+
+```{r}
+#Von Hand gereinigte Database S1 als CSV Datei in RStudio einlesen:
+Database_S1 <- read.table("/Users/niklasnowak/Desktop/UNI/FS23/Geodata_Science/Report_exercice3/Daten_gereinigt/Database_S1_gereinigt.2_.csv",sep=",",header=TRUE)
+
+experiments <- aggregate(cbind(iCO2m, aCO2m) ~ Experiment, data = Database_S1, FUN = mean )
+
+RR = log((experiments$iCO2m/experiments$aCO2m))
+```
+
+```{r warning=FALSE}
+library(tidyverse)
+library(knitr)
+
+RR_Experiment <- Database_S1 |>
+  mutate(RR = log((Database_S1$iCO2m/Database_S1$aCO2m))) |>
+  group_by(Experiment) |>
+  summarise(RR = mean(RR)) 
+
+kable(RR_Experiment)
+```
+
+Report Exercice 4
+
+```{r}
+library(ggplot2)
+
+airquality$Month <- factor(airquality$Month, levels = c(5,6,7,8,9), labels = c("May", "June", "July", "August", "September"))
+# Mittelwerte pro Monat berechnen
+airquality_summary <- airquality %>%
+  group_by(Month) %>%
+  summarize(mean_temp = mean(Temp))
+
+# ggplot erstellen
+ggplot() +
+  # Balken der Monate erstellen
+  geom_bar(data = airquality_summary, aes(x = Month, y = mean_temp, fill = Month),
+           stat = "identity", position = "dodge") +
+  # Boxplot der Tagesdaten erstellen
+  geom_boxplot(data = airquality, aes(x = Month, y = Temp, group = Month),
+               width = 0.5, position = position_dodge(width = 0.9)) +
+  # Labels und Titel hinzufügen
+  labs(x = "Monat", y = "Temperatur [F]", fill = "Month") +
+  scale_fill_manual(values = c("red", "green", "cyan", "violet", "yellow"), 
+                    name = "Month", labels = c("May", "June", "July", "August", "September")) +
+  theme_minimal()
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Datensatz aggregieren
+Aggregierte_Data <- airquality %>%
+  group_by(Month, Day) %>%
+  summarise(Wind = mean(Wind))
+
+#lineare_regression <- lm( ~Wind, data = Aggregierte_Data)
+
+# Facettierte Säulendiagramm-Plots erstellen
+ggplot(Aggregierte_Data, aes(x = Day, y = Wind)) +
+  geom_col() +
+  labs(x = "Tage", y = "Windgeschwindigkeit (mph)") +
+  facet_wrap(~ Month, ncol = 3)
+  geom_density(coloer = "red")
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+
+ggplot(data = airquality, aes(x = Ozone, y = Solar.R, color = "TA_F")) +
+  geom_point(size = 1) +
+  labs(x = "Ozone", y = "Solare Radiation") +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_classic() +
+  scale_color_viridis_c()
+```
+```{r}
+ggplot(
+  data = airquality,
+  aes(x = Ozone, y = Solar.R, color = TA_F)) +
+  geom_point(size = 1.75) +
+  labs(x = expression(paste("Shortwave radiation (W m"^-2, ")")),
+       y = expression(paste("GPP (", mu,"mol CO"[2], " m"^-2, "s"^-1, ")"))) +
+  theme_classic() +
+  scale_color_viridis_c()
+```
+
+
+
+
