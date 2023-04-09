@@ -4,6 +4,7 @@ author: "Niklas Nowak"
 date: "2023-02-27"
 output: html_document
 --- 
+ADGS Report Niklas Nowak
 
 Report Exercice 3
 
