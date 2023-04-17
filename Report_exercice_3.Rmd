@@ -3,17 +3,25 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+Report Exercice 3
 
 ```{r}
-plot(cars)
+#Von Hand gereinigte Database S1 als CSV Datei in RStudio einlesen:
+Database_S1 <- read.table("/Users/niklasnowak/Desktop/UNI/FS23/Geodata_Science/Report_exercice3/Daten_gereinigt/Database_S1_gereinigt.2_.csv",sep=",",header=TRUE)
+
+experiments <- aggregate(cbind(iCO2m, aCO2m) ~ Experiment, data = Database_S1, FUN = mean )
+
+RR = log((experiments$iCO2m/experiments$aCO2m))
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{r warning=FALSE}
+library(tidyverse)
+library(knitr)
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+RR_Experiment <- Database_S1 |>
+  mutate(RR = log((Database_S1$iCO2m/Database_S1$aCO2m))) |>
+  group_by(Experiment) |>
+  summarise(RR = mean(RR)) 
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
+kable(RR_Experiment)
+```
